@@ -55,46 +55,47 @@
     VisaCurrencyAmount *amount = [[VisaCurrencyAmount alloc] initWithDouble:trunc(self.transactionTotal * 100) / 100];
     VisaPurchaseInfo *purchaseInfo = [[VisaPurchaseInfo alloc] initWithTotal:amount currency:self.currencyCode];
     UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-    [self.visaCheckoutButton onCheckoutWithProfile:self.profile
-                                      purchaseInfo:purchaseInfo
-                          presentingViewController:vc
-                                        completion:^(VisaCheckoutResult * _Nonnull result) {
-                                            if (result.statusCode == VisaCheckoutResultStatusSuccess) {
-                                                if (_onCardCheckout) {
-                                                    _onCardCheckout([RNVisaCheckoutUtils createJsonResponseFromCheckoutResult:result]);
-                                                }
-                                            } else {
-                                                VisaCheckoutResultStatus resultStatus = result.statusCode;
-                                                NSString *errorString = nil;
-                                                NSString *errorCode = nil;
-                                                switch (resultStatus) {
-                                                    case VisaCheckoutResultStatusInternalError:
-                                                        errorString = @"Checkout internal error";
-                                                        errorCode = @"E_CHECKOUT_INTERNAL_ERROR";
-                                                        break;
-                                                    case VisaCheckoutResultStatusNotConfigured:
-                                                        errorString = @"Checkout not configured";
-                                                        errorCode = @"E_CHECKOUT_NOT_CONFIGURED";
-                                                        break;
-                                                    case VisaCheckoutResultStatusUserCancelled:
-                                                        errorString = @"User cancelled";
-                                                        errorCode = @"E_CHECKOUT_CANCELLED";
-                                                        break;
-                                                    case VisaCheckoutResultStatusDuplicateCheckoutAttempt:
-                                                        errorString = @"Duplicate checkout attempt";
-                                                        errorCode = @"E_CHECKOUT_DUPLICATE_CHECKOUT";
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
-                                                if (_onCardCheckoutError) {
-                                                    NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
-                                                    response[@"code"] = errorCode;
-                                                    response[@"message"] = errorString;
-                                                    _onCardCheckoutError(response);
-                                                }
-                                            }
-                                            }];
+    [self.visaCheckoutButton onCheckoutWithProfile:self.profile purchaseInfo:purchaseInfo presentingViewController:vc onReady:^(LaunchHandle  _Nonnull launchHandle) {
+        
+    } onButtonTapped:^{
+        
+    } completion:^(VisaCheckoutResult * _Nonnull result) {
+        if (result.statusCode == VisaCheckoutResultStatusSuccess) {
+            if (_onCardCheckout) {
+                _onCardCheckout([RNVisaCheckoutUtils createJsonResponseFromCheckoutResult:result]);
+            }
+        } else {
+            VisaCheckoutResultStatus resultStatus = result.statusCode;
+            NSString *errorString = nil;
+            NSString *errorCode = nil;
+            switch (resultStatus) {
+                case VisaCheckoutResultStatusInternalError:
+                    errorString = @"Checkout internal error";
+                    errorCode = @"E_CHECKOUT_INTERNAL_ERROR";
+                    break;
+                case VisaCheckoutResultStatusNotConfigured:
+                    errorString = @"Checkout not configured";
+                    errorCode = @"E_CHECKOUT_NOT_CONFIGURED";
+                    break;
+                case VisaCheckoutResultStatusUserCancelled:
+                    errorString = @"User cancelled";
+                    errorCode = @"E_CHECKOUT_CANCELLED";
+                    break;
+                case VisaCheckoutResultStatusDuplicateCheckoutAttempt:
+                    errorString = @"Duplicate checkout attempt";
+                    errorCode = @"E_CHECKOUT_DUPLICATE_CHECKOUT";
+                    break;
+                default:
+                    break;
+            }
+            if (_onCardCheckoutError) {
+                NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
+                response[@"code"] = errorCode;
+                response[@"message"] = errorString;
+                _onCardCheckoutError(response);
+            }
+        }
+    }];
 }
 
 - (void)layoutSubviews
