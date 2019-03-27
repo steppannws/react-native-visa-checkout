@@ -20,6 +20,8 @@
 @property (nonatomic, assign) float transactionTotal;
 @property (nonatomic, assign) NSInteger currencyCode;
 
+@property (nonatomic, copy) LaunchHandle launchCheckoutHandle;
+
 @property (nonatomic, copy) RCTDirectEventBlock onCardCheckout;
 @property (nonatomic, copy) RCTDirectEventBlock onCardCheckoutError;
 
@@ -55,10 +57,15 @@
     VisaCurrencyAmount *amount = [[VisaCurrencyAmount alloc] initWithDouble:trunc(self.transactionTotal * 100) / 100];
     VisaPurchaseInfo *purchaseInfo = [[VisaPurchaseInfo alloc] initWithTotal:amount currency:self.currencyCode];
     UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-    [self.visaCheckoutButton onCheckoutWithProfile:self.profile purchaseInfo:purchaseInfo presentingViewController:vc onReady:^(LaunchHandle  _Nonnull launchHandle) {
-        
+
+    [self.visaCheckoutButton 
+     onCheckoutWithProfile:self.profile
+     purchaseInfo:purchaseInfo 
+     presentingViewController:vc 
+     onReady:^(LaunchHandle  _Nonnull launchHandle) {
+        self.launchCheckoutHandle = launchHandle;
     } onButtonTapped:^{
-        
+        [self launchCheckout];
     } completion:^(VisaCheckoutResult * _Nonnull result) {
         if (result.statusCode == VisaCheckoutResultStatusSuccess) {
             if (_onCardCheckout) {
@@ -96,6 +103,12 @@
             }
         }
     }];
+}
+
+- (void)launchCheckout {
+    if (self.launchCheckoutHandle) {
+        self.launchCheckoutHandle();
+    }
 }
 
 - (void)layoutSubviews
