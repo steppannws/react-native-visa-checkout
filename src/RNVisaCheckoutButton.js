@@ -54,7 +54,7 @@ export default class CheckoutButton extends React.Component<Props> {
     checkoutOptions: { total: 0.0, currency: 0 },
     apiKey: '',
     environment: RNVisaCheckout.Environment.Sandbox,
-    profileName: 'default',
+    profileName: null,
   };
 
   _onCardCheckout = event => {
