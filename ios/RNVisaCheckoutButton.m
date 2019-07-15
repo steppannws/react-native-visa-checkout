@@ -56,7 +56,7 @@
 - (void) updateOnCheckout {
     VisaCurrencyAmount *amount = [[VisaCurrencyAmount alloc] initWithDouble:trunc(self.transactionTotal * 100) / 100];
     VisaPurchaseInfo *purchaseInfo = [[VisaPurchaseInfo alloc] initWithTotal:amount currency:self.currencyCode];
-    UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+    UIViewController *vc = [[[[[UIApplication sharedApplication] delegate] window] rootViewController] presentedViewController];
 
     [self.visaCheckoutButton 
      onCheckoutWithProfile:self.profile
